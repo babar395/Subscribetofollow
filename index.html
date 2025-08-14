@@ -2,11 +2,170 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SubscribeToFollow</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <!-- Firebase CDN (no build needed) -->
+  <script type="module">
+    // Firebase v10 (modular) CDNs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+    import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-database.js";
+    // Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBGVki0KdMCM9fq5u-tKjr-eHhox6YCPFQ",
+      authDomain: "subscribetofollow.firebaseapp.com",
+      projectId: "subscribetofollow",
+      storageBucket: "subscribetofollow.firebasestorage.app",
+      messagingSenderId: "684835820085",
+      appId: "1:684835820085:web:0a4a4a958547c655ff977c",
+      databaseURL: "https://subscribetofollow-default-rtdb.firebaseio.com"
+    };
+    // Init & expose singletons for app.js
+    const app = initializeApp(firebaseConfig);
+    window._auth = getAuth(app);
+    window._db = getDatabase(app);
+    // Lightweight state guard so UI doesn't flash
+    onAuthStateChanged(window._auth, () => {
+      document.getElementById("app").style.visibility = "visible";
+    });
+  </script>
+  <script type="module" src="./app.js" defer></script>
 </head>
 <body>
-  <h1>Welcome to SubscribeToFollow</h1>
-  <p>Yeh website abhi development phase mein hai.</p>
+  <header class="nav">
+    <div class="brand">Subscribe<span>To</span>Follow</div>
+    <nav id="nav-links" class="nav-links">
+      <button id="btnLogin" class="link">Login</button>
+      <button id="btnSignup" class="link">Sign Up</button>
+      <button id="btnDashboard" class="link hidden">Dashboard</button>
+      <button id="btnAdmin" class="link hidden">Admin</button>
+      <button id="btnLogout" class="btn danger hidden">Logout</button>
+    </nav>
+  </header>
+
+  <main id="app" style="visibility:hidden">
+    <!-- Landing -->
+    <section id="page-home">
+      <h1 class="title">Earn Coins • Get Followers</h1>
+      <p class="subtitle">
+        Complete tasks on YouTube, TikTok, Facebook, Instagram, Threads, WhatsApp — earn <b>1 coin</b> each.  
+        Create your own task: costs <b>2 coins per follower</b>. Admin approves payments within <b>6 hours</b>.
+      </p>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Diagram</h3>
+          <ol>
+            <li>Sign up / Login</li>
+            <li>Do task → +1 coin</li>
+            <li>Add your task (2 coins per follower)</li>
+            <li>Need coins? Pay USDT (BEP-20) → Upload proof → Admin approves</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h3>Instructions (EN / اردو / हिन्दी)</h3>
+          <div class="tabs">
+            <button class="tab active" data-lang="en">English</button>
+            <button class="tab" data-lang="ur">اردو</button>
+            <button class="tab" data-lang="hi">हिन्दी</button>
+          </div>
+          <div id="lang-en" class="lang active">
+            <ul>
+              <li>Create account (use referral—referrer gets 20 coins)</li>
+              <li>Open Dashboard → complete tasks</li>
+              <li>Add your task with quantity</li>
+              <li>Upload payment proof if you need more coins</li>
+            </ul>
+          </div>
+          <div id="lang-ur" class="lang">
+            <ul>
+              <li>اکاؤنٹ بنائیں (ریفرل دیں—ریفر کرنے والے کو 20 کوائن)</li>
+              <li>ڈیش بورڈ کھولیں → ٹاسک مکمل کریں</li>
+              <li>اپنا ٹاسک بنائیں اور مقدار سیٹ کریں</li>
+              <li>مزید کوائن چاہئیں؟ اسکرین شاٹ اپلوڈ کریں، ایڈمن منظور کرے گا</li>
+            </ul>
+          </div>
+          <div id="lang-hi" class="lang">
+            <ul>
+              <li>अकाउंट बनाएं (रेफरल दें—रेफर करने वाले को 20 कॉइन)</li>
+              <li>डैशबोर्ड खोलें → टास्क पूरे करें</li>
+              <li>अपना टास्क बनाएं और क्वांटिटी सेट करें</li>
+              <li>ज़्यादा कॉइन चाहिए? स्क्रीनशॉट अपलोड करें, एडमिन अप्रूव करेगा</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Auth -->
+    <section id="page-auth" class="hidden">
+      <div class="grid two">
+        <div class="card">
+          <h3>Login</h3>
+          <input id="loginEmail" class="input" type="email" placeholder="Email" />
+          <input id="loginPass" class="input" type="password" placeholder="Password" />
+          <button id="doLogin" class="btn">Login</button>
+        </div>
+        <div class="card">
+          <h3>Sign Up</h3>
+          <input id="signupEmail" class="input" type="email" placeholder="Email" />
+          <input id="signupPass" class="input" type="password" placeholder="Password" />
+          <input id="signupRef"  class="input" type="text" placeholder="Referral Code (optional)" />
+          <button id="doSignup" class="btn">Create Account</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dashboard -->
+    <section id="page-dashboard" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>Your Wallet</h3>
+          <p><b>Coins:</b> <span id="userCoins">0</span></p>
+          <p><b>Your Referral Code:</b> <code id="myRef">-</code></p>
+          <p class="muted">Share your code. When someone signs up with it, you get <b>+20</b> coins.</p>
+        </div>
+
+        <div class="card">
+          <h3>Add Task (Cost: 2 coins/follower)</h3>
+          <input id="taskTitle" class="input" placeholder="e.g., Follow my TikTok" />
+          <input id="taskQty" class="input" type="number" min="1" value="10" />
+          <p class="muted">Followers earn 1 coin each. Your cost = qty × 2.</p>
+          <button id="addTask" class="btn">Create Task</button>
+        </div>
+
+        <div class="card">
+          <h3>Available Tasks</h3>
+          <ul id="taskList" class="list"></ul>
+        </div>
+
+        <div class="card">
+          <h3>Payment Proof (Manual)</h3>
+          <p class="muted">Send USDT (BEP-20) to: <b>0x3fdbe9b843fe9766d8fb05ff28cc876715e2ade2</b></p>
+          <input id="payAmount" class="input" type="number" min="1" step="0.01" placeholder="Amount in USDT" />
+          <input id="payFile" class="input" type="file" accept="image/*" />
+          <button id="sendPay" class="btn">Submit Proof</button>
+          <p class="muted">Admin approves within 6 hours.</p>
+        </div>
+
+        <div class="card">
+          <h3>Notifications</h3>
+          <ul id="notifList" class="list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Admin -->
+    <section id="page-admin" class="hidden">
+      <div class="card">
+        <h3>Admin Panel — Pending Payments</h3>
+        <div id="adminPayWrap"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Floating Support -->
+  <a class="support" href="mailto:babarbhutta395@gmail.com">Support</a>
 </body>
 </html>
